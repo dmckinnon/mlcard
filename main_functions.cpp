@@ -17,6 +17,7 @@ limitations under the License.
 
 #include "main_functions.h"
 #include "pico/stdlib.h"
+#include "hardware/pwm.h"
 #include "audio_provider.h"
 #include "command_responder.h"
 #include "feature_provider.h"
@@ -33,6 +34,8 @@ limitations under the License.
 namespace {
 int count = 0;
 int val = 0;
+
+uint32_t last_inf_time = 0;
 
 
 tflite::ErrorReporter* error_reporter = nullptr;
@@ -57,7 +60,6 @@ tflite::MicroMutableOpResolver<4> micro_op_resolver;//();
 
 FeatureProvider feature_provider(kFeatureElementCount,
                                                  feature_buffer);
-
 }  // namespace
 
 // The name of this function is important for Arduino compatibility.
@@ -141,13 +143,7 @@ void setup() {
   // that will provide the inputs to the neural network.
   // NOLINTNEXTLINE(runtime-global-variables)
   
-  
-  //Serial.println("feature size arg:");
-  //Serial.println(kFeatureElementCount);
-  //Serial.println("feature size member: %d");
-  
-  //feature_provider = &static_feature_provider;
-  //Serial.println(feature_provider->GetFeatureSize());
+  // Sleep to allow setup
   sleep_ms(3000);
 
   static RecognizeCommands static_recognizer(error_reporter);
@@ -159,7 +155,14 @@ void setup() {
   uint8_t on_led = 15;
   gpio_init(on_led);
   gpio_set_dir(on_led, GPIO_OUT);
-  gpio_put(on_led, 1);
+  gpio_set_function(on_led, GPIO_FUNC_PWM);
+  int slice=pwm_gpio_to_slice_num (on_led); 
+  int channel=pwm_gpio_to_channel (on_led);
+  pwm_set_wrap(slice, 31);
+  pwm_set_chan_level(slice, PWM_CHAN_A, 1);
+  // Set initial B output high for 24 cycles before dropping
+  pwm_set_chan_level(slice, PWM_CHAN_B, 24);
+  pwm_set_enabled(slice, true);
 
   for (int i = 16; i < 22; ++i)
   {
@@ -168,24 +171,13 @@ void setup() {
   }
 }
 
-// Inference is being performed, so some data is getting through
-// Then it suddenly stops
-// Likely a crash
+// No audio happening?
+// Look into audio output - print this. What comes from the microphone?
 
 
 // The name of this function is important for Arduino compatibility.
 void loop() {
 
-  count ++;
-  if (count % 1000 == 0)
-  {
-    printf("Looped, toggling LED\n");
-    gpio_put(16, val);
-    val = val == 0? 1: 0;
-    sleep_ms(1000);
-  }
-
-  
   if (interpreter->initialization_status() != kTfLiteOk)
   {
     TF_LITE_REPORT_ERROR(error_reporter, "TFLite initialization failed");
@@ -196,7 +188,17 @@ void loop() {
   // Fetch the spectrogram for the current time.
   //printf("check audio\n");
   const int32_t current_time = LatestAudioTimestamp();
-  //printf("Latest audio timestamp is %d\n", current_time);
+  
+  // FIrstly, turn off LEDs from previous cycles
+  if (current_time - last_inf_time > 1000)
+  {
+    // turn inf LED off:
+    gpio_put(16, 0);
+
+    // also turn off any number LEDs
+  }
+
+
   int how_many_new_slices = 0;
   TfLiteStatus feature_status = feature_provider.PopulateFeatureData(
       error_reporter, previous_time, current_time, &how_many_new_slices);
@@ -212,12 +214,11 @@ void loop() {
   // If no new audio samples have been received since last time, don't bother
   // running the network model.
   if (how_many_new_slices == 0) {
-    printf("no audio\n"); // could be that we get no audio whatsoever
+    //printf("no audio\n"); // could be that we get no audio whatsoever
     return;
   }
 
   // Copy feature buffer to input tensor
-  //printf("check features\n");
   for (int i = 0; i < kFeatureElementCount; i++) {
     model_input_buffer[i] = feature_buffer[i];
   }
@@ -229,7 +230,6 @@ void loop() {
     TF_LITE_REPORT_ERROR(error_reporter, "Invoke failed");
     
     sleep_ms(10000);
-    //printf("invoke failed\n");
     return;
   }
 
@@ -252,7 +252,11 @@ void loop() {
   // just prints to the error console, but you should replace this with your
   // own function for a real application.
   //printf("check response\n");
-  RespondToCommand(error_reporter, current_time, found_command, score,
-                   is_new_command);
-  //printf("check do it all again\n");
+  if (RespondToCommand(error_reporter, current_time, found_command, score,
+                   is_new_command))
+  {
+    
+    last_inf_time = current_time;
+  }
+  
 }
