@@ -29,27 +29,188 @@ limitations under the License.
 #define LEDB LED4
 #define LEDG LED4
 
-const uint8_t LED_PIN = 25;
+void RunLEDs(const char* value)
+{
+  
+  if (value == "one")
+  {
+    for (int i = 0; i < 100; ++i)
+    {
+      gpio_put(20, 1);
+      gpio_put(21, 0);
+      gpio_put(19, 1);
+      gpio_put(18, 1);
+      gpio_put(17, 0);
+      gpio_put(16, 1);
+      sleep_ms(5);
+      gpio_put(20, 0);
+      gpio_put(21, 1);
+      gpio_put(19, 0);
+      gpio_put(18, 0);
+      gpio_put(17, 0);
+      gpio_put(16, 1);
+      sleep_ms(5);
+    }
+  }
+  else if (value == "two")
+  {
+    for (int i = 0; i < 100; ++i)
+    {
+      gpio_put(20, 0);
+      gpio_put(21, 1);
+      gpio_put(19, 1);
+      gpio_put(18, 0);
+      gpio_put(17, 1);
+      gpio_put(16, 1);
+      sleep_ms(5);
+      gpio_put(20, 1);
+      gpio_put(21, 0);
+      gpio_put(19, 1);
+      gpio_put(18, 1);
+      gpio_put(17, 0);
+      gpio_put(16, 1);
+      sleep_ms(5);
+    }
+  }
+  else if (value == "three")
+  {
+    for (int i = 0; i < 100; ++i)
+    {
+      gpio_put(20, 0);
+      gpio_put(21, 1);
+      gpio_put(19, 1);
+      gpio_put(18, 1);
+      gpio_put(17, 0);
+      gpio_put(16, 1);
+      sleep_ms(5);
+      gpio_put(20, 1);
+      gpio_put(21, 0);
+      gpio_put(19, 1);
+      gpio_put(18, 1);
+      gpio_put(17, 0);
+      gpio_put(16, 1);
+      sleep_ms(5);
+    }
+  }
+  else if (value == "four")
+  {
+    for (int i = 0; i < 100; ++i)
+    {
+      gpio_put(20, 0);
+      gpio_put(21, 1);
+      gpio_put(19, 1);
+      gpio_put(18, 1);
+      gpio_put(17, 0);
+      gpio_put(16, 0);
+      sleep_ms(5);
+      gpio_put(20, 1);
+      gpio_put(21, 0);
+      gpio_put(19, 0);
+      gpio_put(18, 1);
+      gpio_put(17, 1);
+      gpio_put(16, 1);
+      sleep_ms(5);
+    }
+  }
+  else if (value == "five")
+  {
+    for (int i = 0; i < 100; ++i)
+    {
+      gpio_put(20, 0);
+      gpio_put(21, 1);
+      gpio_put(19, 0);
+      gpio_put(18, 1);
+      gpio_put(17, 0);
+      gpio_put(16, 1);
+      sleep_ms(5);
+      gpio_put(20, 1);
+      gpio_put(21, 0);
+      gpio_put(19, 1);
+      gpio_put(18, 1);
+      gpio_put(17, 1);
+      gpio_put(16, 1);
+      sleep_ms(5);
+    }
+  }
+  else if (value == "six")
+  {
+    for (int i = 0; i < 100; ++i)
+    {
+      gpio_put(20, 0);
+      gpio_put(21, 1);
+      gpio_put(19, 0);
+      gpio_put(18, 1);
+      gpio_put(17, 1);
+      gpio_put(16, 1);
+      sleep_ms(5);
+      gpio_put(20, 1);
+      gpio_put(21, 0);
+      gpio_put(19, 1);
+      gpio_put(18, 1);
+      gpio_put(17, 1);
+      gpio_put(16, 1);
+      sleep_ms(5);
+    }
+  }
+  else if (value == "seven")
+  {
+    for (int i = 0; i < 100; ++i)
+    {
+      gpio_put(20, 0);
+      gpio_put(21, 1);
+      gpio_put(19, 1);
+      gpio_put(18, 1);
+      gpio_put(17, 0);
+      gpio_put(16, 0);
+      sleep_ms(5);
+      gpio_put(20, 1);
+      gpio_put(21, 0);
+      gpio_put(19, 1);
+      gpio_put(18, 0);
+      gpio_put(17, 0);
+      gpio_put(16, 1);
+      sleep_ms(5);
+    }
+  }
+  else if (value == "eight")
+  {
+    gpio_put(20, 0);
+    gpio_put(21, 0);
+    gpio_put(19, 1);
+    gpio_put(18, 1);
+    gpio_put(17, 1);
+    gpio_put(16, 1);
+    sleep_ms(1000);
+  }
+  else if (value == "nine")
+  {
+    for (int i = 0; i < 100; ++i)
+    {
+      gpio_put(20, 0);
+      gpio_put(21, 1);
+      gpio_put(19, 1);
+      gpio_put(18, 1);
+      gpio_put(17, 0);
+      gpio_put(16, 0);
+      sleep_ms(5);
+      gpio_put(20, 1);
+      gpio_put(21, 0);
+      gpio_put(19, 1);
+      gpio_put(18, 1);
+      gpio_put(17, 1);
+      gpio_put(16, 1);
+      sleep_ms(5);
+    }
+  }
+}
 
 // Toggles the built-in LED every inference, and lights a colored LED depending
 // on which word was detected.
-void RespondToCommand(tflite::ErrorReporter* error_reporter,
+bool RespondToCommand(tflite::ErrorReporter* error_reporter,
                       int32_t current_time, const char* found_command,
                       uint8_t score, bool is_new_command) {
   static bool is_initialized = false;
-  //printf("Respond to Command\n");
   if (!is_initialized) {
-    //pinMode(LED_BUILTIN, OUTPUT);
-    // Pins for the built-in RGB LEDs on the Arduino Nano 33 BLE Sense
-    //pinMode(LEDR, OUTPUT);
-    //pinMode(LEDG, OUTPUT);
-    //pinMode(LEDB, OUTPUT);
-    // Ensure the LED is off by default.
-    // Note: The RGB LEDs on the Arduino Nano 33 BLE
-    // Sense are on when the pin is LOW, off when HIGH.
-    //digitalWrite(LEDR, HIGH);
-    //digitalWrite(LEDG, HIGH);
-    //digitalWrite(LEDB, HIGH);
     
     is_initialized = true;
   }
@@ -59,57 +220,26 @@ void RespondToCommand(tflite::ErrorReporter* error_reporter,
 
   if (score < 100)
   {
-    return;
+    return false;
   }
 
   if (score > 120 && current_time - last_command_time > 700
       && found_command != "unknown" && found_command != "silence") {
-    //TF_LITE_REPORT_ERROR(error_reporter, "Successful inference, heard %s (%d) @%dms", found_command,
-    //                     score, current_time);
     printf("Successful inference, heard %s (%d) @%dms\n", found_command,
                          score, current_time);
     last_command_time = current_time;
-    // If we hear a command, light up the LED
-    
-    
-    // Run a loop for each number
-    // Right now turn them all on
-    gpio_put(16, 1);
-    gpio_put(17, 1);
-    gpio_put(18, 1);
-    gpio_put(19, 1);
-    gpio_put(20, 0);
-    gpio_put(21, 0);
-    sleep_ms(1000);
+    // If we hear a command, light up the LEDs
+    RunLEDs(found_command);
+
   }
 
   // If last_command_time is non-zero but was >3 seconds ago, zero it
   // and switch off the LED.
-  if (last_command_time != 0) {
-    if (last_command_time < (current_time - 1000)) {
-      last_command_time = 0;
-      
-      printf("Zeroing\n");
-      gpio_put(17, 0);
-      for (int i = 16; i < 22; ++i)
-      {
-        gpio_put(i, 0);
-      }
-    }
-  }
-
-  // Otherwise, toggle the LED every time an inference is performed.
-  ++count;
-  if (count & 1) {
-    //Serial.println("Half inference");
-    printf("General inference, heard %s (%d) @%dms\n", found_command,
-                        score, current_time);
-    gpio_put(15, 1);
-  } else {
-    printf("General inference, heard %s (%d) @%dms\n", found_command,
+  printf("General inference, heard %s (%d) @%dms\n", found_command,
                          score, current_time);
-    gpio_put(15, 0);
-  }
+
+  
+  return true;
 }
 
 #endif  // ARDUINO_EXCLUDE_CODE

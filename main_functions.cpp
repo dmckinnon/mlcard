@@ -152,6 +152,7 @@ void setup() {
   previous_time = 0;
 
   // set up LEDs - GPIOs 15-21
+  // this may be unnecessary, if I can stick a bigger resistor on it
   uint8_t on_led = 15;
   gpio_init(on_led);
   gpio_set_dir(on_led, GPIO_OUT);
@@ -171,10 +172,6 @@ void setup() {
   }
 }
 
-// No audio happening?
-// Look into audio output - print this. What comes from the microphone?
-
-
 // The name of this function is important for Arduino compatibility.
 void loop() {
 
@@ -186,16 +183,20 @@ void loop() {
     return;
   }
   // Fetch the spectrogram for the current time.
-  //printf("check audio\n");
   const int32_t current_time = LatestAudioTimestamp();
   
   // FIrstly, turn off LEDs from previous cycles
-  if (current_time - last_inf_time > 1000)
+  if (current_time - last_inf_time > 2000)
   {
     // turn inf LED off:
-    gpio_put(16, 0);
+    gpio_put(20, 1);
+    gpio_put(21, 1);
 
     // also turn off any number LEDs
+    gpio_put(16, 0);
+    gpio_put(17, 0);
+    gpio_put(18, 0);
+    gpio_put(19, 0);
   }
 
 
@@ -205,7 +206,6 @@ void loop() {
   //printf("Populate feature data\n");
   if (feature_status != kTfLiteOk) {
     TF_LITE_REPORT_ERROR(error_reporter, "Feature generation failed");
-    //Serial.println(feature_provider.GetFeatureSize());
     sleep_ms(10000);
     printf("failed features\n");
     return;
@@ -214,7 +214,6 @@ void loop() {
   // If no new audio samples have been received since last time, don't bother
   // running the network model.
   if (how_many_new_slices == 0) {
-    //printf("no audio\n"); // could be that we get no audio whatsoever
     return;
   }
 
@@ -224,7 +223,6 @@ void loop() {
   }
 
   // Run the model on the spectrogram input and make sure it succeeds.
-  //printf("check invoke\n");
   TfLiteStatus invoke_status = interpreter->Invoke();
   if (invoke_status != kTfLiteOk) {
     TF_LITE_REPORT_ERROR(error_reporter, "Invoke failed");
@@ -243,7 +241,7 @@ void loop() {
       output, current_time, &found_command, &score, &is_new_command);
   if (process_status != kTfLiteOk) {
     TF_LITE_REPORT_ERROR(error_reporter,
-                         "RecognizeCommands::ProcessLatestResults() failed");
+                         "RecognizeCommands::ProcessLatestResults(failed");
                          sleep_ms(10000);
     printf("Processing failed\n");
     return;
@@ -251,11 +249,15 @@ void loop() {
   // Do something based on the recognized command. The default implementation
   // just prints to the error console, but you should replace this with your
   // own function for a real application.
-  //printf("check response\n");
   if (RespondToCommand(error_reporter, current_time, found_command, score,
                    is_new_command))
   {
-    
+    gpio_put(16, 1);
+    gpio_put(17, 0);
+    gpio_put(18, 0);
+    gpio_put(19, 0);
+    gpio_put(21, 0);
+    gpio_put(20, 1);
     last_inf_time = current_time;
   }
   

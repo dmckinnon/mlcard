@@ -83,6 +83,7 @@ target_link_libraries(
     pico-tflmicro
     hardware_pio
     hardware_dma
+    hardware_pwm
     pico_stdlib
     PRIVATE
     pico_pdm_microphone
@@ -91,7 +92,7 @@ target_link_libraries(
 # Add the standard include files to the build
 target_include_directories(mlcard PRIVATE
   ${CMAKE_CURRENT_LIST_DIR}
-  #${CMAKE_CURRENT_LIST_DIR}/pdm
+  ${CMAKE_CURRENT_LIST_DIR}/../pdm/include
   #${CMAKE_CURRENT_LIST_DIR}/pdm/include
   ${CMAKE_CURRENT_LIST_DIR}/.. # for our common lwipopts or any other standard includes, if required
 )

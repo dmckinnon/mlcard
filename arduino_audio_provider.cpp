@@ -110,9 +110,9 @@ void CaptureSamples() {
   // also uses leftfalling edge
   // what does this mean for our PIO?
   // It appears to be slightly different to the default setup 
-  printf("Reading %d samples at time %d\n", number_of_samples, time_in_ms);
+  //printf("Reading %d samples at time %d\n", number_of_samples, time_in_ms);
   pdm_microphone_read(g_audio_capture_buffer + capture_index, DEFAULT_PDM_BUFFER_SIZE);
-  printf("REad samples\n");
+  //printf("REad samples\n");
 
   // This is how we let the outside world know that new audio data has arrived.
   g_latest_audio_timestamp = time_in_ms;
