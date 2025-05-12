@@ -48,8 +48,6 @@ target_sources(mlcard
   ${CMAKE_CURRENT_LIST_DIR}/micro_features_micro_features_generator.cpp
   ${CMAKE_CURRENT_LIST_DIR}/micro_features_micro_model_settings.cpp
   ${CMAKE_CURRENT_LIST_DIR}/micro_features_model.cpp
-  ${CMAKE_CURRENT_LIST_DIR}/micro_features_no_micro_features_data.cpp
-  ${CMAKE_CURRENT_LIST_DIR}/micro_features_yes_micro_features_data.cpp
   ${CMAKE_CURRENT_LIST_DIR}/recognize_commands.cpp
   #${CMAKE_CURRENT_LIST_DIR}/*.h
 )
@@ -63,7 +61,8 @@ pico_set_program_version(mlcard "0.1")
 # Add the PDM subdirectory
 # Specify the path to the external pdm library
 set(PDM_PATH ${CMAKE_CURRENT_LIST_DIR}/../pdm)
-set(TFLITE_MICRO_PATH ${CMAKE_CURRENT_LIST_DIR}/../tflitemicro)
+#set(TFLITE_MICRO_PATH ${CMAKE_CURRENT_LIST_DIR}/../tflitemicro)
+set(TFLITE_MICRO_PATH ${CMAKE_CURRENT_LIST_DIR}/../tensorflow)
 
 # Add the pdm library CMake file
 add_subdirectory(${PDM_PATH} ${CMAKE_BINARY_DIR}/pdm_build)
@@ -80,19 +79,20 @@ pico_enable_stdio_usb(mlcard 1)
 target_link_libraries(
     mlcard
     PUBLIC
-    pico-tflmicro
+    #pico-tflmicro
+    pico-tensorflow
     hardware_pio
     hardware_dma
     hardware_pwm
     pico_stdlib
     PRIVATE
-    pico_pdm_microphone
-    pico-tflmicro)
+    pico_pdm_microphone)
 
 # Add the standard include files to the build
 target_include_directories(mlcard PRIVATE
   ${CMAKE_CURRENT_LIST_DIR}
   ${CMAKE_CURRENT_LIST_DIR}/../pdm/include
+  ${CMAKE_CURRENT_LIST_DIR}/../tensorflow
   #${CMAKE_CURRENT_LIST_DIR}/pdm/include
   ${CMAKE_CURRENT_LIST_DIR}/.. # for our common lwipopts or any other standard includes, if required
 )

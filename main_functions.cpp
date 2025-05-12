@@ -256,8 +256,8 @@ void loop() {
     gpio_put(17, 0);
     gpio_put(18, 0);
     gpio_put(19, 0);
-    gpio_put(21, 0);
-    gpio_put(20, 1);
+    gpio_put(21, 1);
+    gpio_put(20, 0);
     last_inf_time = current_time;
   }
   

@@ -36,15 +36,15 @@ void RunLEDs(const char* value)
   {
     for (int i = 0; i < 100; ++i)
     {
-      gpio_put(20, 1);
-      gpio_put(21, 0);
+      gpio_put(20, 0);
+      gpio_put(21, 1);
       gpio_put(19, 1);
       gpio_put(18, 1);
       gpio_put(17, 0);
       gpio_put(16, 1);
       sleep_ms(5);
-      gpio_put(20, 0);
-      gpio_put(21, 1);
+      gpio_put(20, 1);
+      gpio_put(21, 0);
       gpio_put(19, 0);
       gpio_put(18, 0);
       gpio_put(17, 0);
@@ -56,15 +56,15 @@ void RunLEDs(const char* value)
   {
     for (int i = 0; i < 100; ++i)
     {
-      gpio_put(20, 0);
-      gpio_put(21, 1);
+      gpio_put(20, 1);
+      gpio_put(21, 0);
       gpio_put(19, 1);
       gpio_put(18, 0);
       gpio_put(17, 1);
       gpio_put(16, 1);
       sleep_ms(5);
-      gpio_put(20, 1);
-      gpio_put(21, 0);
+      gpio_put(20, 0);
+      gpio_put(21, 1);
       gpio_put(19, 1);
       gpio_put(18, 1);
       gpio_put(17, 0);
@@ -76,15 +76,15 @@ void RunLEDs(const char* value)
   {
     for (int i = 0; i < 100; ++i)
     {
-      gpio_put(20, 0);
-      gpio_put(21, 1);
+      gpio_put(20, 1);
+      gpio_put(21, 0);
       gpio_put(19, 1);
       gpio_put(18, 1);
       gpio_put(17, 0);
       gpio_put(16, 1);
       sleep_ms(5);
-      gpio_put(20, 1);
-      gpio_put(21, 0);
+      gpio_put(20, 0);
+      gpio_put(21, 1);
       gpio_put(19, 1);
       gpio_put(18, 1);
       gpio_put(17, 0);
@@ -96,15 +96,15 @@ void RunLEDs(const char* value)
   {
     for (int i = 0; i < 100; ++i)
     {
-      gpio_put(20, 0);
-      gpio_put(21, 1);
+      gpio_put(20, 1);
+      gpio_put(21, 0);
       gpio_put(19, 1);
       gpio_put(18, 1);
       gpio_put(17, 0);
       gpio_put(16, 0);
       sleep_ms(5);
-      gpio_put(20, 1);
-      gpio_put(21, 0);
+      gpio_put(20, 0);
+      gpio_put(21, 1);
       gpio_put(19, 0);
       gpio_put(18, 1);
       gpio_put(17, 1);
@@ -116,15 +116,15 @@ void RunLEDs(const char* value)
   {
     for (int i = 0; i < 100; ++i)
     {
-      gpio_put(20, 0);
-      gpio_put(21, 1);
+      gpio_put(20, 1);
+      gpio_put(21, 0);
       gpio_put(19, 0);
       gpio_put(18, 1);
       gpio_put(17, 0);
       gpio_put(16, 1);
       sleep_ms(5);
-      gpio_put(20, 1);
-      gpio_put(21, 0);
+      gpio_put(20, 0);
+      gpio_put(21, 1);
       gpio_put(19, 1);
       gpio_put(18, 1);
       gpio_put(17, 1);
@@ -136,15 +136,15 @@ void RunLEDs(const char* value)
   {
     for (int i = 0; i < 100; ++i)
     {
-      gpio_put(20, 0);
-      gpio_put(21, 1);
+      gpio_put(20, 1);
+      gpio_put(21, 0);
       gpio_put(19, 0);
       gpio_put(18, 1);
       gpio_put(17, 1);
       gpio_put(16, 1);
       sleep_ms(5);
-      gpio_put(20, 1);
-      gpio_put(21, 0);
+      gpio_put(20, 0);
+      gpio_put(21, 1);
       gpio_put(19, 1);
       gpio_put(18, 1);
       gpio_put(17, 1);
@@ -156,15 +156,15 @@ void RunLEDs(const char* value)
   {
     for (int i = 0; i < 100; ++i)
     {
-      gpio_put(20, 0);
-      gpio_put(21, 1);
+      gpio_put(20, 1);
+      gpio_put(21, 0);
       gpio_put(19, 1);
       gpio_put(18, 1);
       gpio_put(17, 0);
       gpio_put(16, 0);
       sleep_ms(5);
-      gpio_put(20, 1);
-      gpio_put(21, 0);
+      gpio_put(20, 0);
+      gpio_put(21, 1);
       gpio_put(19, 1);
       gpio_put(18, 0);
       gpio_put(17, 0);
@@ -186,19 +186,53 @@ void RunLEDs(const char* value)
   {
     for (int i = 0; i < 100; ++i)
     {
-      gpio_put(20, 0);
-      gpio_put(21, 1);
+      gpio_put(20, 1);
+      gpio_put(21, 0);
       gpio_put(19, 1);
       gpio_put(18, 1);
       gpio_put(17, 0);
       gpio_put(16, 0);
       sleep_ms(5);
-      gpio_put(20, 1);
-      gpio_put(21, 0);
+      gpio_put(20, 0);
+      gpio_put(21, 1);
       gpio_put(19, 1);
       gpio_put(18, 1);
       gpio_put(17, 1);
       gpio_put(16, 1);
+      sleep_ms(5);
+    }
+  }
+  else if (value == "on")
+  {
+    for (int i = 0; i < 100; ++i)
+    {
+      gpio_put(20, 1);
+      gpio_put(21, 0);
+      gpio_put(19, 0);
+      gpio_put(18, 1);
+      gpio_put(17, 1);
+      gpio_put(16, 1);
+      sleep_ms(5);
+      gpio_put(20, 0);
+      gpio_put(21, 1);
+      gpio_put(19, 0);
+      gpio_put(18, 1);
+      gpio_put(17, 0);
+      gpio_put(16, 1);
+      sleep_ms(5);
+    }
+  }
+  else if (value == "off")
+  {
+    for (int i = 0; i < 100; ++i)
+    {
+      gpio_put(20, 0);
+      gpio_put(21, 1);
+      gpio_put(19, 0);
+      gpio_put(18, 1);
+      gpio_put(17, 0);
+      gpio_put(16, 1);
+      sleep_ms(5);
       sleep_ms(5);
     }
   }
@@ -218,7 +252,7 @@ bool RespondToCommand(tflite::ErrorReporter* error_reporter,
   static int count = 0;
   static int certainty = 220;
 
-  if (score < 100)
+  if (score < 50)
   {
     return false;
   }
