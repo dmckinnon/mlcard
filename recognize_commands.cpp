@@ -14,6 +14,8 @@ limitations under the License.
 ==============================================================================*/
 
 #include "recognize_commands.h"
+#include "pico/stdlib.h"
+#include <stdio.h>
 
 #include <limits>
 
@@ -85,6 +87,7 @@ TfLiteStatus RecognizeCommands::ProcessLatestResults(
     *found_command = previous_top_label_;
     *score = 0;
     *is_new_command = false;
+    printf("too few results\n");
     return kTfLiteOk;
   }
 
@@ -102,9 +105,12 @@ TfLiteStatus RecognizeCommands::ProcessLatestResults(
       }
     }
   }
+  printf("Average scores: \n");
   for (int i = 0; i < kCategoryCount; ++i) {
     average_scores[i] /= how_many_results;
+    printf("%d\n", average_scores[i]);
   }
+  printf("\n\n");
 
   // Find the current highest scoring category.
   int current_top_index = 0;

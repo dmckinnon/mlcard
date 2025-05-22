@@ -214,6 +214,9 @@ void loop() {
   // If no new audio samples have been received since last time, don't bother
   // running the network model.
   if (how_many_new_slices == 0) {
+    TF_LITE_REPORT_ERROR(error_reporter, "No new slices, wait some time");
+    // maybe wait a bit here
+    sleep_ms(60);
     return;
   }
 

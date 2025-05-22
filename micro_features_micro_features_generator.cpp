@@ -19,6 +19,8 @@ limitations under the License.
 #include <cstring>
 #include <cstdio>
 
+#include "pico/time.h"
+
 #include "tensorflow/lite/experimental/microfrontend/lib/frontend.h"
 #include "tensorflow/lite/experimental/microfrontend/lib/frontend_util.h"
 #include "micro_features_micro_model_settings.h"
@@ -79,11 +81,14 @@ TfLiteStatus GenerateMicroFeatures(tflite::ErrorReporter* error_reporter,
   } else {
     frontend_input = input + 160;
   }
-  //printf("Process samples frontend\n");
+  TF_LITE_REPORT_ERROR(error_reporter, "FFT");
+  uint32_t milliseconds = to_us_since_boot(get_absolute_time());
   FrontendOutput frontend_output = FrontendProcessSamples(
       &g_micro_features_state, frontend_input, input_size, num_samples_read);
+  uint32_t diff = to_us_since_boot(get_absolute_time()) - milliseconds;
+    TF_LITE_REPORT_ERROR(error_reporter, "FFT processing took %d micros with size %d", diff, frontend_output.size);
 
-  //printf("Now do scaling for %d samples\n", frontend_output.size);
+  printf("Features: \n");
   for (size_t i = 0; i < frontend_output.size; ++i) {
     // These scaling values are derived from those used in input_data.py in the
     // training pipeline.
@@ -113,7 +118,9 @@ TfLiteStatus GenerateMicroFeatures(tflite::ErrorReporter* error_reporter,
       value = 127;
     }
     output[i] = value;
+    printf("%d\n", output[i]);
   }
+  printf("\n");
 
   return kTfLiteOk;
 }

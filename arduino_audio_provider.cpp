@@ -35,7 +35,7 @@ limitations under the License.
 #ifndef ARDUINO_EXCLUDE_CODE
 
 #include "audio_provider.h"
-#include "audio_data.h"
+//#include "audio_data.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -47,7 +47,7 @@ limitations under the License.
 #include "micro_features_micro_model_settings.h"
 
 namespace {
-constexpr int DEFAULT_PDM_BUFFER_SIZE = 512;
+constexpr int DEFAULT_PDM_BUFFER_SIZE = kMaxAudioSampleSize;//512;
 
 bool g_is_audio_initialized = false;
 // An internal buffer able to fit 16x our sample size
@@ -113,7 +113,7 @@ void CaptureSamples() {
   // It appears to be slightly different to the default setup 
   //printf("Reading %d samples at time %d\n", number_of_samples, time_in_ms);
   pdm_microphone_read(g_audio_capture_buffer + capture_index, DEFAULT_PDM_BUFFER_SIZE);
-  //printf("REad samples\n");
+  printf("Audio update at time %d from time %d with %d samples\n", time_in_ms, g_latest_audio_timestamp, number_of_samples);
 
   // This is how we let the outside world know that new audio data has arrived.
   g_latest_audio_timestamp = time_in_ms;
@@ -192,17 +192,20 @@ TfLiteStatus GetAudioSamples(tflite::ErrorReporter* error_reporter,
   // Determine the index, in the history of all samples, of the first
   // sample we want
   const int start_offset = start_ms * (kAudioSampleFrequency / 1000);
-  uint16_t* audio = (uint16_t*)audio_raw;
+  //uint16_t* audio = (uint16_t*)audio_raw;
   // Determine how many samples we want in total
   const int duration_sample_count =
       duration_ms * (kAudioSampleFrequency / 1000);
+
+  printf("Start time: %d\n", start_offset);// % audio2_raw_len);
   for (int i = 0; i < duration_sample_count; ++i) {
     // For each sample, transform its index in the history of all samples into
     // its index in g_audio_capture_buffer
-    const int capture_index = (start_offset + i) % audio2_raw_len;//kAudioCaptureBufferSize;
+    //const int capture_index = (start_offset + i) % audio2_raw_len;//kAudioCaptureBufferSize;
+    const int capture_index = (start_offset + i) % kAudioCaptureBufferSize;
     // Write the sample to the output buffer
-    //g_audio_output_buffer[i] = g_audio_capture_buffer[capture_index];
-    g_audio_output_buffer[i] = audio[capture_index];
+    g_audio_output_buffer[i] = g_audio_capture_buffer[capture_index];
+    //g_audio_output_buffer[i] = audio[capture_index];
   }
 
   // Set pointers to provide access to the audio

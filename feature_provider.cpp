@@ -52,6 +52,7 @@ TfLiteStatus FeatureProvider::PopulateFeatureData(
   //printf("Figuring out steps, %d / %d\n", time_in_ms, kFeatureSliceStrideMs);
   const int last_step = (last_time_in_ms / kFeatureSliceStrideMs);
   const int current_step = (time_in_ms / kFeatureSliceStrideMs);
+  printf("time window: %d - %d = %d\n", current_step, last_step, current_step - last_step);
 
   int slices_needed = current_step - last_step;
   // If this is the first call, make sure we don't use any cached information.
@@ -100,7 +101,11 @@ TfLiteStatus FeatureProvider::PopulateFeatureData(
   //printf("Pull audio for %d slices\n", slices_needed);
   // Any slices that need to be filled in with feature data have their
   // appropriate audio data pulled, and features calculated for that slice.
+  int numFeatureSetsGenerated = 0;
   if (slices_needed > 0) {
+    printf(
+      "Feature gen stats: \nto keep: %d\nkFeatureSliceCount: %d\nslices needed: %d\n",
+      slices_to_keep, kFeatureSliceCount, slices_needed);
     for (int new_slice = slices_to_keep; new_slice < kFeatureSliceCount;
          ++new_slice) {
       const int new_step = (current_step - kFeatureSliceCount + 1) + new_slice;
@@ -109,8 +114,6 @@ TfLiteStatus FeatureProvider::PopulateFeatureData(
       int audio_samples_size = 0;
       // TODO(petewarden): Fix bug that leads to non-zero slice_start_ms
       // I'm hitting this bug. Why is this a problem? oh, negative
-      //printf("Is slice_start_ms nonzero? %d\n", slice_start_ms);
-      //printf("new_slice: %d\nnew_step: %d\nkFeatureSliceStride: %d\nslice_start_ms = %d\n", new_slice, new_step, kFeatureSliceStrideMs, slice_start_ms);
       GetAudioSamples(error_reporter, (slice_start_ms > 0 ? slice_start_ms : 0),
                       kFeatureSliceDurationMs, &audio_samples_size,
                       &audio_samples);
@@ -126,6 +129,7 @@ TfLiteStatus FeatureProvider::PopulateFeatureData(
       TfLiteStatus generate_status = GenerateMicroFeatures(
           error_reporter, audio_samples, audio_samples_size, kFeatureSliceSize,
           new_slice_data, &num_samples_read);
+      numFeatureSetsGenerated ++;
       if (generate_status != kTfLiteOk) {
         printf("Failed generating features\n");
         return generate_status;
@@ -133,5 +137,7 @@ TfLiteStatus FeatureProvider::PopulateFeatureData(
       //printf("Finsihed generating features\n");
     }
   }
+  if (numFeatureSetsGenerated != 0)
+    printf("Generated %d feature sets\n", numFeatureSetsGenerated);
   return kTfLiteOk;
 }
