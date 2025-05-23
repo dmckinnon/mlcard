@@ -88,7 +88,6 @@ TfLiteStatus GenerateMicroFeatures(tflite::ErrorReporter* error_reporter,
   uint32_t diff = to_us_since_boot(get_absolute_time()) - milliseconds;
     TF_LITE_REPORT_ERROR(error_reporter, "FFT processing took %d micros with size %d", diff, frontend_output.size);
 
-  printf("Features: \n");
   for (size_t i = 0; i < frontend_output.size; ++i) {
     // These scaling values are derived from those used in input_data.py in the
     // training pipeline.
@@ -118,9 +117,7 @@ TfLiteStatus GenerateMicroFeatures(tflite::ErrorReporter* error_reporter,
       value = 127;
     }
     output[i] = value;
-    printf("%d\n", output[i]);
   }
-  printf("\n");
 
   return kTfLiteOk;
 }

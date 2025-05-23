@@ -35,19 +35,17 @@ limitations under the License.
 #ifndef ARDUINO_EXCLUDE_CODE
 
 #include "audio_provider.h"
-//#include "audio_data.h"
 
 #include <stdio.h>
 #include <string.h>
 
 #include "pico/stdlib.h"
 
-//#include "pdm/include/pdm_microphone.h"
 #include "pico/pdm_microphone.h"
 #include "micro_features_micro_model_settings.h"
 
 namespace {
-constexpr int DEFAULT_PDM_BUFFER_SIZE = kMaxAudioSampleSize;//512;
+constexpr int DEFAULT_PDM_BUFFER_SIZE = kMaxAudioSampleSize;
 
 bool g_is_audio_initialized = false;
 // An internal buffer able to fit 16x our sample size
@@ -66,8 +64,8 @@ const struct pdm_microphone_config config = {
     // PIO State Machine instance to use
     .pio_sm = 0,
 
-    // sample rate in Hz - not 16kHz?
-    .sample_rate = kAudioSampleFrequency,//8000,
+    // sample rate in Hz
+    .sample_rate = kAudioSampleFrequency,
 
     // number of samples to buffer
     .sample_buffer_size = DEFAULT_PDM_BUFFER_SIZE,
@@ -98,62 +96,35 @@ void CaptureSamples() {
   // Determine the index of this sample in our ring buffer
   const int capture_index = start_sample_offset % kAudioCaptureBufferSize;
 
-  // Read the data to the correct place in our buffer
-  //PDM.read(g_audio_capture_buffer + capture_index, DEFAULT_PDM_BUFFER_SIZE);
-
-  // g_audio_Capture_buffer should be 0x4000 in length, 16384
-  // starts at 0x20006550, goes to 0x2000A550 and no further
-  // When we write to 15872 of 16384, so not all the way, we cross over the boundary
-  // THis should be exactly the final amount. 512 + 15872 == 16384 and yet
-
-  // sample frequency is 16 000
-  // on nRF PDM, this means a PDM clock of 1280K
-  // also uses leftfalling edge
-  // what does this mean for our PIO?
-  // It appears to be slightly different to the default setup 
-  //printf("Reading %d samples at time %d\n", number_of_samples, time_in_ms);
   pdm_microphone_read(g_audio_capture_buffer + capture_index, DEFAULT_PDM_BUFFER_SIZE);
-  printf("Audio update at time %d from time %d with %d samples\n", time_in_ms, g_latest_audio_timestamp, number_of_samples);
-
   // This is how we let the outside world know that new audio data has arrived.
   g_latest_audio_timestamp = time_in_ms;
 }
 
 TfLiteStatus InitAudioRecording(tflite::ErrorReporter* error_reporter) {
 
-  printf("sample rate = %d, config value is %d\n", kAudioSampleFrequency, config.sample_rate);
   if (pdm_microphone_init(&config) < 0) {
     printf("PDM microphone initialization failed! Infinite loop\n");
     while (1) { tight_loop_contents(); }
   }
 
-
-
   // Hook up the callback that will be called with each sample
-  //PDM.onReceive(CaptureSamples);
   pdm_microphone_set_samples_ready_handler(CaptureSamples);
   pdm_microphone_set_filter_gain(20);
 
   // Start listening for audio: MONO @ 16KHz with gain at 20
-  //PDM.begin(1, kAudioSampleFrequency);
-  //PDM.setGain(20);
   if (pdm_microphone_start() < 0) {
     printf("PDM microphone start failed! Infinite loop\n");
     while (1) { tight_loop_contents(); }
   }
-
 
   // Block until we have our first audio sample
   while (!g_latest_audio_timestamp) {
     printf("blocking on audio\n");
   }
 
-  printf("----------------------------------\n\n\n\n------------------------------------\n");
-  printf("LET THE AUDIO BEGIN\n");
-  //while (1)
-  //{
-//
-//  }
+  //printf("----------------------------------\n\n\n\n------------------------------------\n");
+  //printf("LET THE AUDIO BEGIN\n");
 
   return kTfLiteOk;
 }
@@ -178,34 +149,18 @@ TfLiteStatus GetAudioSamples(tflite::ErrorReporter* error_reporter,
   // often enough and the buffer is large enough that this call will be made
   // before that happens.
 
-
-
-  // Test code with test audio on known good microphone
-  //static uint32_t capture_index = 0;
-  //if (capture_index >= audio_raw_len) {
-  //  capture_index = 0;  // or loop back: capture_index = 0;
-  //}
-  // If original samples were signed 8-bit, cast directly; if 16-bit
-  // stereo/etc, adjust accordingly.
-  //uint8_t raw = audio_raw[capture_index++];
-
-  // Determine the index, in the history of all samples, of the first
-  // sample we want
+  // Determine the index, in the history of all samples, of the first sample we want
   const int start_offset = start_ms * (kAudioSampleFrequency / 1000);
-  //uint16_t* audio = (uint16_t*)audio_raw;
   // Determine how many samples we want in total
   const int duration_sample_count =
       duration_ms * (kAudioSampleFrequency / 1000);
 
-  printf("Start time: %d\n", start_offset);// % audio2_raw_len);
   for (int i = 0; i < duration_sample_count; ++i) {
     // For each sample, transform its index in the history of all samples into
     // its index in g_audio_capture_buffer
-    //const int capture_index = (start_offset + i) % audio2_raw_len;//kAudioCaptureBufferSize;
     const int capture_index = (start_offset + i) % kAudioCaptureBufferSize;
     // Write the sample to the output buffer
     g_audio_output_buffer[i] = g_audio_capture_buffer[capture_index];
-    //g_audio_output_buffer[i] = audio[capture_index];
   }
 
   // Set pointers to provide access to the audio

@@ -257,8 +257,8 @@ bool RespondToCommand(tflite::ErrorReporter* error_reporter,
     return false;
   }
 
-  if (score > 120){// && current_time - last_command_time > 700
-      //&& found_command != "unknown" && found_command != "silence") {
+  if (score > 120// && current_time - last_command_time > 700
+      && found_command != "unknown" && found_command != "silence") {
     printf("Successful inference, heard %s (%d) @%dms\n", found_command,
                          score, current_time);
     last_command_time = current_time;

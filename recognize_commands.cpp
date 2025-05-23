@@ -105,12 +105,10 @@ TfLiteStatus RecognizeCommands::ProcessLatestResults(
       }
     }
   }
-  printf("Average scores: \n");
+
   for (int i = 0; i < kCategoryCount; ++i) {
     average_scores[i] /= how_many_results;
-    printf("%d\n", average_scores[i]);
   }
-  printf("\n\n");
 
   // Find the current highest scoring category.
   int current_top_index = 0;

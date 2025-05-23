@@ -21,11 +21,12 @@ limitations under the License.
 
 // The size of the input time series data we pass to the FFT to produce the
 // frequency information. This has to be a power of two, and since we're dealing
-// with 30ms of 16KHz inputs, which means 480 samples, this is the next value.
-// THere's an issue though - we have 2 bytes per sample. So this is 256 samples, not 512
-// either halve the frequency, or double the max size. I tried increasing the size,
-// which gave me 60ms of samples, and results were not much better
-constexpr int kMaxAudioSampleSize = 2048;//512;
+// with 30ms of 16KHz inputs, which means 480 samples, so 512 is the next value.
+// There's an issue though - we have 2 bytes per sample. So this is 256 samples, not 512
+// dmckinnon: I tested with different sample sizes, and 8kHz vs 16kHz ... 
+// I couldn't figure out why, but sample size of 1024 and 16kHz, plus speaking slowly,
+// makes this work on the RP2040. Haven't a damn clue why. 
+constexpr int kMaxAudioSampleSize = 1024;
 constexpr int kAudioSampleFrequency = 16000;
 
 // The following values are derived from values used during model training.

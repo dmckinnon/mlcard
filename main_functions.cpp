@@ -13,8 +13,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
-//#include <TensorFlowLite.h>
-
 #include "main_functions.h"
 #include "pico/stdlib.h"
 #include "hardware/pwm.h"
@@ -28,7 +26,6 @@ limitations under the License.
 #include "tensorflow/lite/micro/micro_interpreter.h"
 #include "tensorflow/lite/micro/micro_mutable_op_resolver.h"
 #include "tensorflow/lite/schema/schema_generated.h"
-//#include "tensorflow/lite/version.h"
 
 // Globals, used for compatibility with Arduino-style sketches.
 namespace {
@@ -42,7 +39,6 @@ tflite::ErrorReporter* error_reporter = nullptr;
 const tflite::Model* model = nullptr;
 tflite::MicroInterpreter* interpreter = nullptr;
 TfLiteTensor* model_input = nullptr;
-//FeatureProvider* feature_provider = nullptr;
 RecognizeCommands* recognizer = nullptr;
 int32_t previous_time = 0;
 
@@ -54,9 +50,7 @@ uint8_t tensor_arena[kTensorArenaSize];
 int8_t feature_buffer[kFeatureElementCount];
 int8_t* model_input_buffer = nullptr;
 
-tflite::MicroMutableOpResolver<4> micro_op_resolver;//();
-//tflite::MicroResourceVariables resource_variables;
-//tflite::MicroProfilerInterface profiler;
+tflite::MicroMutableOpResolver<4> micro_op_resolver;
 
 FeatureProvider feature_provider(kFeatureElementCount,
                                                  feature_buffer);
@@ -64,7 +58,6 @@ FeatureProvider feature_provider(kFeatureElementCount,
 
 // The name of this function is important for Arduino compatibility.
 void setup() {
-
 
   stdio_init_all();
 
@@ -139,31 +132,22 @@ void setup() {
   }
   model_input_buffer = model_input->data.int8;
 
-  // Prepare to access the audio spectrograms from a microphone or other source
-  // that will provide the inputs to the neural network.
-  // NOLINTNEXTLINE(runtime-global-variables)
-  
   // Sleep to allow setup
   sleep_ms(3000);
 
+  // Prepare to access the audio spectrograms from a microphone or other source
+  // that will provide the inputs to the neural network.
+  // NOLINTNEXTLINE(runtime-global-variables)
   static RecognizeCommands static_recognizer(error_reporter);
   recognizer = &static_recognizer;
 
   previous_time = 0;
 
   // set up LEDs - GPIOs 15-21
-  // this may be unnecessary, if I can stick a bigger resistor on it
   uint8_t on_led = 15;
   gpio_init(on_led);
   gpio_set_dir(on_led, GPIO_OUT);
-  gpio_set_function(on_led, GPIO_FUNC_PWM);
-  int slice=pwm_gpio_to_slice_num (on_led); 
-  int channel=pwm_gpio_to_channel (on_led);
-  pwm_set_wrap(slice, 31);
-  pwm_set_chan_level(slice, PWM_CHAN_A, 1);
-  // Set initial B output high for 24 cycles before dropping
-  pwm_set_chan_level(slice, PWM_CHAN_B, 24);
-  pwm_set_enabled(slice, true);
+  gpio_put(on_led, 1);
 
   for (int i = 16; i < 22; ++i)
   {
@@ -203,7 +187,6 @@ void loop() {
   int how_many_new_slices = 0;
   TfLiteStatus feature_status = feature_provider.PopulateFeatureData(
       error_reporter, previous_time, current_time, &how_many_new_slices);
-  //printf("Populate feature data\n");
   if (feature_status != kTfLiteOk) {
     TF_LITE_REPORT_ERROR(error_reporter, "Feature generation failed");
     sleep_ms(10000);
@@ -216,7 +199,7 @@ void loop() {
   if (how_many_new_slices == 0) {
     TF_LITE_REPORT_ERROR(error_reporter, "No new slices, wait some time");
     // maybe wait a bit here
-    sleep_ms(60);
+    sleep_ms(60); // THIS IS A LEVER
     return;
   }
 
@@ -249,9 +232,9 @@ void loop() {
     printf("Processing failed\n");
     return;
   }
-  // Do something based on the recognized command. The default implementation
-  // just prints to the error console, but you should replace this with your
-  // own function for a real application.
+  
+  // Now that we have a command, do score thresholding
+  // and if its good enough do the LED thing
   if (RespondToCommand(error_reporter, current_time, found_command, score,
                    is_new_command))
   {
